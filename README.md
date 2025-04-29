@@ -5,7 +5,7 @@ LLM Price Scraper is a Python package designed to scrape and organize pricing in
 
 *   **DocsBot:** <https://docsbot.ai/tools/gpt-openai-api-pricing-calculator>
 *   **Botgenuity:** <https://www.botgenuity.com/tools/llm-pricing>
-*   **Hugging Face:** Data extracted from <https://huggingface.co/spaces/philschmid/llm-pricing/blob/main/src/lib/data.ts>
+*   **Hugging Face:** Data extracted from <https://huggingface.co/spaces/Presidentlin/llm-pricing-calculator/resolve/main/src/lib/data.ts>
 *   **Google:** <https://ai.google.dev/gemini-api/docs/pricing>
 
 *(Note: Other sources like huhuhang and direct OpenAI scraping are currently disabled due to source availability or scraping challenges.)*
