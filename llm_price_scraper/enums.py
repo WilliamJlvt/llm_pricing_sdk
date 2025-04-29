@@ -4,5 +4,6 @@ class DataSources(Enum):
     DOCSBOT = "docsbot"  # Most likely to be used
     BOTGENUITY = "botgenuity"
     HUGGINGFACE = "huggingface"
-    HUHUHANG = "huhuhang"
-    OPENAI = "openai"
+    GOOGLE = "google"
+    # HUHUHANG = "huhuhang" # Disabled
+    # OPENAI = "openai" # Disabled

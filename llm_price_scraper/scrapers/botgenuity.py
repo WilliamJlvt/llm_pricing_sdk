@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 from llm_price_scraper.models import LLMModelPricing
+from llm_price_scraper.utils import parse_context_window
 
 
 class BotgenuityScraper:
@@ -25,15 +26,24 @@ class BotgenuityScraper:
             if len(cells) >= 5:
                 provider = cells[0].text.strip()
                 model = cells[1].text.strip()
-                context = cells[2].text.strip()
+                context_str = cells[2].text.strip()
+                context_window = parse_context_window(context_str)
                 input_tokens_price = cells[3].text.strip().replace("$", "")
                 output_tokens_price = cells[4].text.strip().replace("$", "")
-                updated = datetime.strptime(cells[6].text.strip(), "%B %d, %Y").strftime("%Y-%m-%d")
+                updated = None
+                if len(cells) >= 7:
+                    try:
+                        updated = datetime.strptime(cells[6].text.strip(), "%B %d, %Y").strftime("%Y-%m-%d")
+                    except (ValueError, IndexError):
+                        print(f"Warning: Could not parse update date for model {model}")
+                        updated = datetime.now().strftime("%Y-%m-%d")
+                else:
+                    updated = datetime.now().strftime("%Y-%m-%d")
 
                 pricing_info = LLMModelPricing(
                     provider=provider,
                     model=model,
-                    context=context,
+                    context=context_window,
                     input_tokens_price=float(input_tokens_price) if input_tokens_price else 0.0,
                     output_tokens_price=float(output_tokens_price) if output_tokens_price else 0.0,
                     source=url,

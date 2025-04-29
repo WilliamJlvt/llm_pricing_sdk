@@ -1,77 +1,145 @@
 # LLM Price Scraper
-LLM Price Scraper is a Python package designed to scrape and organize pricing information for large language models (LLMs)
-from the following sources:
-- https://docsbot.ai/tools/gpt-openai-api-pricing-calculator (best source for now)
-- https://huggingface.co/spaces/philschmid/llm-pricing
-- https://www.botgenuity.com/tools/llm-pricing
-- https://llm-price.com
+LLM Price Scraper is a Python package designed to scrape and organize pricing information for large language models (LLMs) from various web sources.
+
+**Supported Data Sources:**
+
+*   **DocsBot:** <https://docsbot.ai/tools/gpt-openai-api-pricing-calculator>
+*   **Botgenuity:** <https://www.botgenuity.com/tools/llm-pricing>
+*   **Hugging Face:** Data extracted from <https://huggingface.co/spaces/philschmid/llm-pricing/blob/main/src/lib/data.ts>
+*   **Google:** <https://ai.google.dev/gemini-api/docs/pricing>
+
+*(Note: Other sources like huhuhang and direct OpenAI scraping are currently disabled due to source availability or scraping challenges.)*
 
 ## Installation
+
 You can install the package using pip:
 ```bash
-pip install llm-price-scraper==1.0.3
+pip install .
+# Or for development:
+pip install -e .
+```
+*(Alternatively, if published)*
+```bash
+# pip install llm-price-scraper 
 ```
 
-## Usage
-Once you have installed the scrapper, you can use it to quickly retrieve the current pricing information from the website.
-```python
-from llm_price_scraper.scrapers import LlmPricingScraper
+## Python Usage
 
-# Get the pricing information
-pricing_data = LlmPricingScraper.scrape()
+Once installed, you can import and use the scraper in your Python code:
 
-# Loop through each pricing entry and print data
-for entry in pricing_data:
-    print(f"Model: {entry.model}")
-    print(f"Provider: {entry.provider}")
-    print(f"1M input tokens: {entry.input_tokens_price}$")
-    print(f"1M output tokens: {entry.output_tokens_price}$")
-    print(f"Context: {entry.context}")
-    print(f"Source: {entry.source}")
-    print(f"Updated: {entry.updated}")
-    print("-" * 40)
-    
-# get all gpt-4o models
-gpt_4o_models = [entry for entry in pricing_data if "gpt-4o" in entry.model.lower()]
-print("GPT-4o models:")
-for entry in gpt_4o_models:
-    print(f"Model: {entry.model}")
-    print(f"Provider: {entry.provider}")
-    print(f"1M input tokens: {entry.input_tokens_price}$")
-    print(f"1M output tokens: {entry.output_tokens_price}$")
-    print(f"Context: {entry.context}")
-    print(f"Source: {entry.source}")
-    print(f"Updated: {entry.updated}")
-    print("-" * 40)
-```
-You can also chose the source of the data you want to scrape by passing the source as an argument to the `scrape` method. The available sources are defined in the `DataSources` enum.
 ```python
 from llm_price_scraper.scrapers import LlmPricingScraper, DataSources
 
-pricing_data = LlmPricingScraper.scrape(DataSources.HUGGINGFACE)
+# --- Get data from a specific source ---
+print("\n--- Scraping DocsBot ---")
+docsbot_data = LlmPricingScraper.scrape(DataSources.DOCSBOT)
+
+# Print the first entry (if any)
+if docsbot_data:
+    print(docsbot_data[0]) 
+    # Output includes model, provider, input_tokens_price (per 1M), output_tokens_price (per 1M), context, source, updated
+else:
+    print("No data found for DocsBot.")
+
+# --- Get data from Google ---
+print("\n--- Scraping Google ---")
+google_data = LlmPricingScraper.scrape(DataSources.GOOGLE)
+if google_data:
+    print(google_data[0])
+else:
+    print("No data found for Google.")
+    
+# --- Get data from Hugging Face (Default if no source specified) ---
+print("\n--- Scraping Hugging Face (Default) ---")
+hf_data = LlmPricingScraper.scrape() # Defaults to HUGGINGFACE
+if hf_data:
+    print(hf_data[0])
+else:
+    print("No data found for Hugging Face.")
 ```
 
-### Example Output
-After running the above code, you should see an output like this:
+## Command-Line Script Usage (`scrape_llm_prices.py`)
 
+A utility script `scrape_llm_prices.py` is included for convenient command-line scraping and output generation.
+
+**Basic Usage:**
+
+```bash
+# Navigate to the project root directory first
+
+# Scrape a single source (outputs to <SourceName>.json by default)
+python3 scrape_llm_prices.py DOCSBOT
+python3 scrape_llm_prices.py GOOGLE
+
+# Scrape all available sources and merge (outputs to COMBINED_LLM_PRICING.json by default)
+python3 scrape_llm_prices.py ALL
 ```
-Model: gpt-4-32k
-Provider: OpenAI
-1M input tokens: 60
-1M output tokens: 120
-Context: 32K
-Source: https://www.botgenuity.com/tools/llm-pricing
-Updated: March 16, 2024
-----------------------------------------
-...
+
+**Specifying Output Format:**
+
+Use the `--format` or `-f` option to specify the output format (`json` or `lua`). JSON is the default.
+
+```bash
+# Output DOCSBOT data as Lua
+python3 scrape_llm_prices.py DOCSBOT --format lua 
+
+# Output combined data as Lua
+python3 scrape_llm_prices.py ALL -f lua
+
+# Output Google data as JSON (default format)
+python3 scrape_llm_prices.py GOOGLE -f json 
+```
+
+**Available Sources for Script:**
+
+Run the script without arguments to see the list of currently enabled sources:
+```bash
+python3 scrape_llm_prices.py
+```
+
+### Example Output (`.json` format)
+
+The JSON output (`COMBINED_LLM_PRICING.json` or `<SourceName>.json`) contains metadata and models grouped by provider:
+
+```json
+{
+    "metadata": {
+        "source_description": "All enabled sources", // or specific source name
+        "generated_at": "2023-10-27T10:00:00.123456",
+        "price_unit": "USD per 1k tokens"
+    },
+    "models": {
+        "google": {
+            "Gemini 1.5 Pro": {
+                "model": "Gemini 1.5 Pro",
+                "input_cost_per_1k_tokens": 0.00125,
+                "output_cost_per_1k_tokens": 0.005,
+                "context_window_tokens": 128000,
+                "source": "https://ai.google.dev/gemini-api/docs/pricing",
+                "updated": "2025-04-21"
+            },
+            // ... other Google models
+        },
+        "anthropic": {
+            "claude-3-haiku": {
+                "model": "claude-3-haiku",
+                "input_cost_per_1k_tokens": 0.00025,
+                "output_cost_per_1k_tokens": 0.00125,
+                "context_window_tokens": 200000,
+                "source": "https://www.botgenuity.com/tools/llm-pricing",
+                "updated": "2024-12-20"
+             },
+            // ... other Anthropic models (from various sources)
+        },
+        // ... other providers
+    }
+}
 ```
 
 ### Error Handling
-In case of a failure to connect to the webpage, an exception will be thrown with an appropriate message. For example:
+Both the Python library and the command-line script will print error messages to standard error (`stderr`) if scraping fails for a specific source.
 
-```
-Exception: Failed to retrieve the webpage. Status code: 404
-```
+When using `ALL` in the script, errors for one source will not stop the scraping of others.
 
 ## Contributing
 Contributions, bug reports, and feature requests are welcome! Feel free to submit a pull request or open an issue on GitHub.

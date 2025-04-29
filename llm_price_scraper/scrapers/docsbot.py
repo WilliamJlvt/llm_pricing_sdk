@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from llm_price_scraper.models import LLMModelPricing
+from llm_price_scraper.utils import parse_context_window
 
 
 class DocsBotScraper:
@@ -37,7 +38,9 @@ class DocsBotScraper:
                     # If no <div> is found, use the text content of the <td>
                     model_name = model_name
 
-                context = cells[2].text.strip()
+                context_str = cells[2].text.strip()
+                context_window = parse_context_window(context_str)
+
                 input_tokens_price = cells[3].text.strip().replace("$", "")
                 output_tokens_price = cells[4].text.strip().replace("$", "")
                 updated = datetime.now().strftime("%Y-%m-%d")
@@ -49,7 +52,7 @@ class DocsBotScraper:
                         input_tokens_price) if input_tokens_price else 0.0,
                     output_tokens_price=float(
                         output_tokens_price) if output_tokens_price else 0.0,
-                    context=context,
+                    context=context_window,
                     source=url,
                     updated=updated
                 )

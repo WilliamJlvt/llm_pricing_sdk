@@ -51,9 +51,12 @@ def save_to_json(data, filename):
 
 if __name__ == "__main__":
     sources_to_scrape = [
+        DataSources.DOCSBOT,
         DataSources.BOTGENUITY,
-        DataSources.HUHUHANG,
-        DataSources.DOCSBOT
+        DataSources.HUGGINGFACE,
+        DataSources.GOOGLE,
+        # DataSources.HUHUHANG, # Disabled
+        # DataSources.OPENAI # Disabled
     ]
 
     combined_models = combine_models(sources_to_scrape)
