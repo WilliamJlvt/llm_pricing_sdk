@@ -8,7 +8,7 @@ from llm_price_scraper.models import LLMModelPricing
 class HuggingfaceScraper:
     @staticmethod
     def scrape():
-        url = "https://huggingface.co/spaces/philschmid/llm-pricing/resolve/main/src/lib/data.ts"
+        url = "https://huggingface.co/spaces/Presidentlin/llm-pricing-calculator/resolve/main/src/lib/data.ts"
 
         provider_regex = re.compile(r"provider: '(.*?)',")
         uri_regex = re.compile(r"uri: '(.*?)',")
