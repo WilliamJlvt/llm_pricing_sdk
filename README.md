@@ -58,46 +58,47 @@ else:
     print("No data found for Hugging Face.")
 ```
 
-## Command-Line Script Usage (`scrape_llm_prices.py`)
+## Command-Line Script Usage (`examples/scrape_cli.py`)
 
-A utility script `scrape_llm_prices.py` is included for convenient command-line scraping and output generation.
+A utility script `examples/scrape_cli.py` is included for convenient command-line scraping and output generation.
 
 **Basic Usage:**
 
 ```bash
 # Navigate to the project root directory first
 
-# Scrape a single source (outputs to <SourceName>.json by default)
-python3 scrape_llm_prices.py DOCSBOT
-python3 scrape_llm_prices.py GOOGLE
+# Scrape a single source (outputs to <SourceName>.json by default, prices per 1M tokens)
+python3 examples/scrape_cli.py DOCSBOT
+python3 examples/scrape_cli.py GOOGLE
 
-# Scrape all available sources and merge (outputs to COMBINED_LLM_PRICING.json by default)
-python3 scrape_llm_prices.py ALL
+# Scrape all available sources and merge (outputs to COMBINED_LLM_PRICING.json by default, prices per 1M tokens)
+python3 examples/scrape_cli.py ALL
 ```
 
-**Specifying Output Format:**
+**Specifying Output Format and Price Unit:**
 
-Use the `--format` or `-f` option to specify the output format (`json` or `lua`). JSON is the default.
+*   Use the `--format` or `-f` option to specify the output format (`json` or `lua`). JSON is the default.
+*   Use the `--unit` or `-u` option to specify the price unit (`1m` for per Million tokens, `1k` for per Thousand tokens). `1m` is the default.
 
 ```bash
-# Output DOCSBOT data as Lua
-python3 scrape_llm_prices.py DOCSBOT --format lua 
+# Output DOCSBOT data as Lua, prices per 1k tokens
+python3 examples/scrape_cli.py DOCSBOT --format lua --unit 1k
 
-# Output combined data as Lua
-python3 scrape_llm_prices.py ALL -f lua
+# Output combined data as Lua, prices per 1M tokens (default unit)
+python3 examples/scrape_cli.py ALL -f lua -u 1m 
 
-# Output Google data as JSON (default format)
-python3 scrape_llm_prices.py GOOGLE -f json 
+# Output Google data as JSON, prices per 1k tokens
+python3 examples/scrape_cli.py GOOGLE -f json -u 1k
 ```
 
 **Available Sources for Script:**
 
 Run the script without arguments to see the list of currently enabled sources:
 ```bash
-python3 scrape_llm_prices.py
+python3 examples/scrape_cli.py
 ```
 
-### Example Output (`.json` format)
+### Example Output (`.json` format, default unit: 1m)
 
 The JSON output (`COMBINED_LLM_PRICING.json` or `<SourceName>.json`) contains metadata and models grouped by provider:
 
@@ -105,8 +106,8 @@ The JSON output (`COMBINED_LLM_PRICING.json` or `<SourceName>.json`) contains me
 {
     "metadata": {
         "source_description": "All enabled sources", // or specific source name
-        "generated_at": "2023-10-27T10:00:00.123456",
-        "price_unit": "USD per 1k tokens"
+        "generated_at": "2024-10-28T12:00:00.123456",
+        "price_unit": "USD per 1m tokens"
     },
     "models": {
         "google": {
